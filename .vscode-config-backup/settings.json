@@ -1,0 +1,86 @@
+{
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "workbench.iconTheme": "Monokai Pro Icons",
+  "material-icon-theme.folders.color": "#ff7043",
+  "editor.tabSize": 1,
+  "editor.cursorWidth": 2,
+  "editor.cursorBlinking": "expand",
+  "editor.cursorStyle": "line",
+  "editor.cursorSmoothCaretAnimation": "on",
+
+  "interactiveWindow.showExecutionHint": false,
+  "vsicons.dontShowNewVersionMessage": true,
+
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+
+  "editor.wordWrap": "on",
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll.eslint": "explicit"
+  },
+
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "javascriptreact",
+    "typescriptreact"
+  ],
+  "eslint.alwaysShowStatus": true,
+  "files.autoSave": "afterDelay",
+  "workbench.colorTheme": "SynthWave '84",
+  "files.associations": {
+    "*.tsx": "typescriptreact"
+  },
+  "workbench.colorCustomizations": {
+    "editor.background": "#000000",
+    "editor.foreground": "#FFFFFF",
+
+    "editor.lineHighlightBackground": "#9900ff11",
+    "editor.selectionBackground": "#00ffcc44",
+    "editor.selectionHighlightBackground": "#ff00cc33",
+    "editor.inactiveSelectionBackground": "#11111199",
+
+    "sideBar.background": "#0a0a0a",
+    "sideBar.foreground": "#CCCCCC",
+    "activityBar.background": "#0a0a0a",
+    "activityBar.foreground": "#FFFFFF",
+    "titleBar.activeBackground": "#0a0a0a",
+    "titleBar.activeForeground": "#FFFFFF",
+    "titleBar.inactiveBackground": "#111111",
+    "titleBar.inactiveForeground": "#999999",
+    "tab.activeBackground": "#111111",
+    "tab.inactiveBackground": "#0a0a0a",
+    "tab.activeForeground": "#FFFFFF",
+    "tab.inactiveForeground": "#888888",
+
+    // Panel / Terminal
+    "panel.background": "#0a0a0a",
+    "panel.border": "#1a1a1a",
+    "terminal.background": "#000000",
+    "terminal.foreground": "#CCCCCC",
+
+    "editor.wordHighlightBackground": "#ff00ff11"
+  },
+
+  "editor.minimap.enabled": false,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "html": "html",
+    "vue": "html",
+    "javascriptreact": "html",
+    "typescriptreact": "html"
+  },
+  "editor.snippetSuggestions": "inline",
+  "tailwindCSS.emmetCompletions": true
+}
