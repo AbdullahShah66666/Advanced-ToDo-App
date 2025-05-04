@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { nanoid } from "nanoid";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEdit, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 
 interface ToDoItem {
@@ -18,9 +18,55 @@ export default function ToDoList() {
   const [toDoList, setToDoList] = useState<ToDoItem[]>([]);
   const [triggerDeletion, setTriggerDeletion] = useState(false);
   const [editInput, setEditInput] = useState(false);
+  const [editInputValue, setEditInputValue] = useState<string>("");
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  const divForInput = useRef<HTMLInputElement>(null);
+  const divForTasks = useRef<HTMLInputElement>(null);
+  const divForDeleteLine = useRef<HTMLInputElement>(null);
   const allSelected =
     toDoList.length > 0 && toDoList.every((item) => itemCheckedStates[item.id]);
+
+  useEffect(() => {
+    if (editInput) {
+      console.log("input is here");
+    }
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!editInputRef.current?.contains(e.target as Node)) {
+        setEditInput(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [editInput]);
+
+  useEffect(() => {
+    if (triggerDeletion) {
+      console.log("Deletion Enabled");
+    }
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        !divForInput.current?.contains(e.target as Node) &&
+        !divForTasks.current?.contains(e.target as Node) &&
+        !divForDeleteLine.current?.contains(e.target as Node)
+      ) {
+        setTriggerDeletion(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [triggerDeletion]);
 
   // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //  const inputValue = e.target.value;
@@ -54,12 +100,23 @@ export default function ToDoList() {
   const handleEditTask = (item: ToDoItem) => {
     const text = item.text;
     setEditInput(true);
+    setEditInputValue(text);
+    setEditingItemId(item.id);
     console.log("Edit Clicked:", text);
   };
 
   const handleEditEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && editingItemId) {
       setEditInput(false);
+      setToDoList((prev) =>
+        prev.map((todoItem) =>
+          todoItem.id === editingItemId
+            ? { ...todoItem, text: editInputValue }
+            : todoItem
+        )
+      );
+      setEditingItemId(null); // Clean up
+      setEditInputValue(""); // Clean Up
       console.log("Enter in edit input pressed");
     }
   };
@@ -107,19 +164,33 @@ export default function ToDoList() {
 
   return (
     <div className='bg-black flex flex-col items-center gap-2 container max-w-auto min-h-screen'>
-      {editInput ? (
-        <div className='fixed inset-0 bg-black/80 z-50 flex items-center justify-center'>
-          <input
-            placeholder='Edit Your Task'
-            //value={}
-            className='bg-blue-600 py-3 px-3 rounded-3xl placeholder:text-2xl placeholder:font-semibold'
-            onKeyDown={handleEditEnter}
-          />
-        </div>
-      ) : null}
+      {/* Input Overlay For Editing */}
+      <AnimatePresence>
+        {editInput && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className='fixed inset-0 bg-black/80 z-50 flex items-center justify-center'
+          >
+            <input
+              ref={editInputRef}
+              value={editInputValue}
+              onChange={(e) => setEditInputValue(e.target.value)}
+              className='bg-blue-600 py-3 px-3 rounded-3xl text-lg font-semibold'
+              onKeyDown={handleEditEnter}
+              autoFocus
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* input for taking list items */}
-      <div className='bg-background text-foreground rounded-3xl flex flex-row justify-center gap-1 w-full md:w-3/4'>
-        <div className='relative w-2/4 has-focus-within:w-full transition-width duration-600'>
+      <div
+        ref={divForInput}
+        className='bg-background text-foreground rounded-3xl flex flex-row justify-center gap-1 w-full md:w-3/4'
+      >
+        <div className='relative w-2/3 has-focus-within:w-full transition-width duration-600'>
           <Input
             ref={inputRef}
             className='rounded-3xl placeholder:text-sm placeholder:opacity-100 placeholder:text-foreground focus:placeholder:opacity-70 transition-all duration-300'
@@ -165,6 +236,7 @@ export default function ToDoList() {
       <AnimatePresence>
         {triggerDeletion && toDoList.length > 0 ? (
           <motion.div
+            ref={divForDeleteLine}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -177,33 +249,28 @@ export default function ToDoList() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.2 }}
               className={`${allSelected ? "bg-green-500" : "bg-red-500"} rounded-2xl px-2 py-1 flex flex-row items-center gap-2`}
             >
               <AnimatePresence mode='wait'>
                 <motion.span
                   key={allSelected ? "DeSelect" : "Select"}
-                  initial={{ opacity: 0, y: 5 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
+                  exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
                   className='text-lg md:text-md font-medium'
+                  onClick={handleSelectAll}
                 >
                   {allSelected ? "DeSelect All" : "Select All"}
                 </motion.span>
               </AnimatePresence>
-
-              <input
-                type='checkbox'
-                className='w-4 h-4 accent-black'
-                onClick={handleSelectAll}
-              />
             </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>
       {/* parent div of the ul to show list items */}
-      <div className='min-w-1/2'>
+      <div ref={divForTasks} className='min-w-1/2'>
         <ul className='bg-gray-700 w-full'>
           <AnimatePresence>
             {toDoList.map((item) => (
